@@ -1,14 +1,12 @@
 # PDFTranslator
 This tool could help you translate your English PDF file and give you a Chinese PDF file.
 
-# PDF文档翻译使用说明
-
 ----
 
 
 [TOC]
 
-----
+
 #1. 在Ubuntu下安装python
 本程序是在 python3.5 下经过测试，理论上在python3都可以运行。若没有合适的运行环境，使用以下命令进行安装：
 ```
@@ -16,7 +14,7 @@ sudo apt-get install python3
 ```
 
 
-----
+
 #2. 安装依赖
 ##2.1 安装 pip3
 ```
@@ -35,7 +33,7 @@ sudo apt-get install wkhtmltopdf
 ```
 
 
------
+
 #3. 百度API获取
 **1.** 需要在 [百度翻译][1] 申请API的账号和密码
 **2.** 并将账号和密码，用 **英文引号** 括起来，填入 **configuration.py 文件** 中的 **userAppid** 和 **userSecretKey**
@@ -44,7 +42,7 @@ userAppid = "你的appid"
 userSecretKey = "你的密钥"
 ```
 
-----
+
 #4. 如何运行程序
 **1.**  运行 **'Pdf2Pdf.py'** 文件
             
