@@ -10,6 +10,7 @@ from multiprocessing import Pool
 from time import sleep,ctime
 import re
 import chardet
+import zipfile
 
 def getTranslatedPDF(enHtml, chHtml):
     trans.trans_pdf(enHtml, chHtml)
@@ -61,14 +62,10 @@ def pdf_translation(pdf_file):
     print('step 4 ------------------------')
     os.chdir(path_trans)
     out = out[0] + '.pdf'
-    print('out is ', out)
     mergepdf.MergePDF(path_trans, out)
     os.system(" mv %s %s" % (out, path_download))
-
     output = path_download+out
-    # output = output.encode("utf-8").decode("latin1")
 
-    print('(PDFtranslatioin func)  output is ',output)
     return output
 
 class PDFTranslationHandler(tornado.web.RequestHandler):
@@ -78,8 +75,6 @@ class PDFTranslationHandler(tornado.web.RequestHandler):
 
     def post(self):
         files = self.request.files.get('file')
-        print('The length of files is :',len(files))
-        print('getcwd ', os.getcwd())
 
         path_root = os.getcwd()
         path_upload = path_root + '/upload_file/'
@@ -89,16 +84,13 @@ class PDFTranslationHandler(tornado.web.RequestHandler):
         os.system("mkdir %s" % path_upload)
         os.system("mkdir %s" % path_download)
 
+        outputList = []
         for file in files:
             os.system("rm -r %s" % path_trans)
             os.system("mkdir %s" % path_trans)
             try:
-                print('input content type : ', file['content_type'])
-                print('filename is ', file["filename"])
                 timestamp = file["filename"][:-4] +'_'+str(random.randint(0,200))
                 file_addr = path_upload +timestamp + '.pdf'
-                print(file_addr)
-
                 with open(file_addr, 'wb') as f:
                     f.write(file['body'].strip())
                     try:
@@ -108,25 +100,8 @@ class PDFTranslationHandler(tornado.web.RequestHandler):
                             sleep(1)
                             PDFTranslationHandler.get(self)
                             continue
-                        print('The Current Path is ', os.getcwd())
-                        print('The new pdf is : ', new_pdf)
-
-                        try:
-                            with open(new_pdf, 'rb') as f:
-                                new_pdf2 = new_pdf.split('/')[-1]
-                                self.set_header("Content-Type","application/pdf")
-                                self.set_header("Content-Disposition","attachment; filename=%s" % new_pdf2.encode().decode('latin-1'))
-                                print('Opening the file ...  ', new_pdf2)
-                                while True:
-                                    data = f.read(1024)
-                                    if not data:
-                                        break
-                                    self.write(data)
-                        except Exception as e:
-                            print('with open exception : ', e)
+                        outputList.append(os.path.join('.' ,'upload_file' , new_pdf.split('/')[-1]))
                         os.chdir(path_root)
-                        print('Ending ...')          
-
                     except Exception as e:
                         print("Exception (while opening file) :", e)
                         json_data = json.dumps({"status": 'fail', "result": str(e)}, ensure_ascii=False)
@@ -136,6 +111,32 @@ class PDFTranslationHandler(tornado.web.RequestHandler):
             except Exception as e:
                 os.chdir(path_root)
                 print("Exception (while translating file):", e)
+
+        if len(outputList) > 1:
+            zipfilename = 'output_PDF.zip'
+            f = zipfile.ZipFile(zipfilename,'w',zipfile.ZIP_DEFLATED) 
+            for output in outputList:
+                f.write(output)
+            f.close() 
+            output = zipfilename
+        else:
+            output = outputList[0]
+
+        try:
+            with open(output, 'rb') as f:
+                self.set_header("Content-Type","application/octet-stream")
+                if zipfile.is_zipfile(output):
+                    self.set_header("Content-Disposition","attachment; filename=%s" % output)
+                else:
+                    self.set_header("Content-Disposition","attachment; filename=%s" % output.split('/')[-1].encode().decode('latin-1'))
+                while True:
+                    data = f.read(1024)
+                    if not data:
+                        break
+                    self.write(data)
+        except Exception as e:
+            print('with open exception : ', e)
+            
         self.finish()
 
 
@@ -146,6 +147,6 @@ def make_app():
 
 if __name__ == "__main__":
     app = make_app()
-    app.listen(8888)
+    app.listen(8899)
     tornado.ioloop.IOLoop.current().start()
     print('Begining ...')
