@@ -47,6 +47,10 @@ userSecretKey = "你的密钥"
 ```
 python3 Pdf2Pdf.py
 ```
+
 **2.** 打开浏览器，输入网址 **http://localhost:8899/**
-**3.** 上传英文PDF (文件名称不能有中文)，点击 **"commit"**， 进行翻译
+**3.** 上传英文PDF *（支持中文文件名）*，点击 **"commit"**， 进行翻译
+**4.** 支持上传多个文件，输出名为 **‘output_PDF.zip’** 的压缩包
+
+
 [1]: http://api.fanyi.baidu.com/api/trans/product/index
