@@ -52,3 +52,9 @@ def MergePDF(filepath, outfile):
 
 if __name__ == '__main__':
     pass
+    # time1 = time.time()
+    # file_dir = '.'
+    # out = u"/test.pdf"
+    # MergePDF(file_dir, out)
+    # time2 = time.time()
+    # print(u'总共耗时： %.4f s' % (time2 - time1))

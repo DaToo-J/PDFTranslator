@@ -17,6 +17,7 @@ def English_to_Chinese(text):
     url = 'http://api.fanyi.baidu.com/api/trans/vip/translate'
     q = text
     fromLang = 'en'
+    # fromLang = 'fra'
     toLang = 'zh'
     salt = random.randint(32768, 65536)
     sign = appid + q + str(salt) + secretKey
@@ -39,8 +40,9 @@ def English_to_Chinese(text):
             result_after.append(i['dst'])
         return result_after
     else:
+        print('baidu_test.py , error code is ', r.status_code)
         return None
         
 if __name__ == '__main__':
-    pass
+    English_to_Chinese('apple\nred\n')
 

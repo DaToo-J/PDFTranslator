@@ -7,6 +7,7 @@ import os
 import pdfkit
 import mergepdf
 from multiprocessing import Pool
+from configuration import trytimes 
 
 def chunks(arr, m):
     n = int(math.ceil(len(arr) / float(m)))
@@ -28,10 +29,15 @@ def trans_pdf(input,output):
 					text = ''
 	if text:
 		texts.append(text)
+
 	if texts :
 		result_chinese = []
 		for text in texts:
-			result_chinese +=English_to_Chinese(text)		
+			for t in range(trytimes):
+				chineseTxt = English_to_Chinese(text)	
+				if chineseTxt:	
+					result_chinese += chineseTxt
+					break
 		for node in soup.body.div.children:
 			if type(node) ==element.Tag:
 				text_content = node.get_text().strip()

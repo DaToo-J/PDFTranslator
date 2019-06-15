@@ -31,11 +31,10 @@ def pdf_translation(pdf_file):
     print('step 2 ------------------------')
     files = os.listdir(path_upload)
     filename = filename.split('/')[-1]
-    count = 0
-    for i in files:
-        if filename in i and '.html' in i :
-            count += 1
-    count = count -2
+    pattern = '%s-[0-9]*?.html' % filename
+    files = ' '.join(files)
+    result = re.findall(pattern, files)
+    count = len(result)
 
     # 3. Translating all HTMLs and converting them to PDFs
     print('step 3 ------------------------')
@@ -90,6 +89,8 @@ class PDFTranslationHandler(tornado.web.RequestHandler):
             os.system("mkdir %s" % path_trans)
             try:
                 timestamp = file["filename"][:-4] +'_'+str(random.randint(0,200))
+                timestamp = timestamp.replace(' ', '')
+                timestamp = timestamp.replace(' ', '')
                 file_addr = path_upload +timestamp + '.pdf'
                 with open(file_addr, 'wb') as f:
                     f.write(file['body'].strip())
@@ -100,7 +101,7 @@ class PDFTranslationHandler(tornado.web.RequestHandler):
                             sleep(1)
                             PDFTranslationHandler.get(self)
                             continue
-                        outputList.append(os.path.join('.' ,'upload_file' , new_pdf.split('/')[-1]))
+                        outputList.append(os.path.join('.' ,'download' , new_pdf.split('/')[-1]))
                         os.chdir(path_root)
                     except Exception as e:
                         print("Exception (while opening file) :", e)
